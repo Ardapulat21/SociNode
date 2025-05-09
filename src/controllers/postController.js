@@ -1,13 +1,8 @@
 const postService = require("../services/postService");
+var formidable = require("formidable");
 
 exports.fetchPosts = (req, res) => {
   const posts = postService.fetchPosts();
-  console.log("post are fetched");
-  // res.set({
-  //   "Content-Type": "application/json",
-  //   "Access-Control-Allow-Origin": "*",
-  // });
-  console.log(posts);
   res.json(posts);
 };
 
