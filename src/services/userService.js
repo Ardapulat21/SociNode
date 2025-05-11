@@ -1,9 +1,14 @@
-const users = [];
+const db = require("../config/db");
 
-exports.fetchUsers = () => users;
+exports.fetchUsers = () => {};
 
-exports.createUser = (data) => {
-  const newUser = { date: Date.now(), ...data };
-  users.push(newUser);
-  return newUser;
+exports.createUser = async (req, res) => {
+  try {
+    const user = await User.create(req.body);
+    res.status(201).json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
+
+exports.login = (data) => {};

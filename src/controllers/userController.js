@@ -5,8 +5,8 @@ exports.fetchUsers = (req, res) => {
   res.json(users);
 };
 
-exports.createUser = (req, res) => {
-  const user = userService.createUser(req.body);
+exports.register = (req, res) => {
+  const user = userService.register(req.body);
   res.status(201).json(user);
 };
 

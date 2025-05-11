@@ -1,103 +1,50 @@
-const user = {
-  id: 1,
-  name: "Arda",
-  surname: "Pulat",
-  avatarUrl: "Arda Pulat.jpeg",
+const post = require("../models/post");
+const user = require("../models/user");
+let postCounter = 0;
+exports.fetchPosts = async () => {
+  try {
+    console.log("post service fetch Posts");
+    const posts = await post.find();
+    return posts;
+  } catch (err) {
+    throw new Error(err.message);
+  }
 };
 
-const posts = [
-  {
-    id: 1,
-    user: user,
-    description: "Hey",
-    imgUrl: "hapinnes.png",
-    likes: [
-      {
-        id: 1,
-        name: "Arda",
-        surname: "Pulat",
-        avatarUrl: "Arda Pulat.jpeg",
-      },
-      {
-        id: 1,
-        name: "Arda",
-        surname: "Pulat",
-        avatarUrl: "Arda Pulat.jpeg",
-      },
-      {
-        id: 1,
-        name: "Arda",
-        surname: "Pulat",
-        avatarUrl: "Arda Pulat.jpeg",
-      },
-    ],
-    comments: [
-      {
-        id: 1,
-        user: user,
-        comment: "hey its comment",
-      },
-      {
-        id: 1,
-        user: user,
-        comment: "hey its comment",
-      },
-      {
-        id: 1,
-        user: user,
-        comment: "hey its comment",
-      },
-    ],
-    date: new Date("10/02/2024"),
-  },
-  {
-    id: 1,
-    user: user,
-    description: "Hey",
-    imgUrl: "hapinnes.png",
-    likes: [
-      {
-        id: 1,
-        name: "Arda",
-        surname: "Pulat",
-        avatarUrl: "Arda Pulat.jpeg",
-      },
-      {
-        id: 1,
-        name: "Arda",
-        surname: "Pulat",
-        avatarUrl: "Arda Pulat.jpeg",
-      },
-      {
-        id: 1,
-        name: "Arda",
-        surname: "Pulat",
-        avatarUrl: "Arda Pulat.jpeg",
-      },
-    ],
-    comments: [
-      {
-        id: 1,
-        user: user,
-        comment: "hey its comment",
-      },
-      {
-        id: 1,
-        user: user,
-        comment: "hey its comment",
-      },
-      {
-        id: 1,
-        user: user,
-        comment: "hey its comment",
-      },
-    ],
-    date: new Date("10/02/2024"),
-  },
-];
+const fetchUserById = async (id) => {
+  try {
+    console.log("post service fetch Post");
+    const fetchedUser = await user.findOne({ _id: id });
+    return fetchedUser;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
 
-exports.fetchPosts = () => posts;
+exports.createPost = async (body, files) => {
+  try {
+    const fetchedUser = await user.findOne({ id: body.id });
+    console.log(`Fetched User:${fetchedUser}`);
 
-exports.createPost = (data) => {
-  posts.push(data);
+    const imgUrl = files
+      ? `../../uploads/${fetchedUser.username}/${files.originalname}`
+      : "";
+    const createdPost = {
+      id: `${postCounter++}`,
+      user: fetchedUser,
+      description: body.description,
+      imgUrl: imgUrl,
+      likes: [],
+      comments: [],
+      date: Date.now(),
+    };
+    console.log(`body: ${JSON.stringify(body)}`);
+    console.log(`files: ${JSON.stringify(files)}`);
+    console.log(`imgUrl: ${imgUrl}`);
+
+    const newPost = await post.create(createdPost);
+    return newPost;
+  } catch (err) {
+    throw new Error(err.message);
+  }
 };
