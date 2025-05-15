@@ -1,10 +1,8 @@
 const express = require("express");
 const cors = require("cors");
-const multer = require("multer");
 const path = require("path");
-const user = require("./models/user");
-const userAuth = require("./models/userAuth");
 
+const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const postRoutes = require("./routes/postRoutes");
 const connectDB = require("./config/db");
@@ -16,8 +14,11 @@ connectDB();
 app.use(express.json());
 app.use(cors());
 
+app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/post", postRoutes);
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

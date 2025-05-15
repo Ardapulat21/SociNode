@@ -3,7 +3,6 @@ const router = express.Router();
 const userController = require("../controllers/userController");
 
 router.get("/", userController.fetchUsers);
-router.post("/register", userController.register);
-router.post("/login", userController.login);
-
+router.get("/fetchUserByUsername", userController.fetchUserByUsername);
+router.get("/fetchUserById", userController.fetchUserById);
 module.exports = router;

@@ -12,6 +12,7 @@ npm-debug.log*
 
 # Environment variables
 .env
+.DS_Store
 
 # IDE and editor settings
 .vscode/

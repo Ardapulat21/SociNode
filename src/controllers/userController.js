@@ -1,15 +1,28 @@
 const userService = require("../services/userService");
 
-exports.fetchUsers = (req, res) => {
-  const users = userService.fetchUsers();
-  res.json(users);
+exports.fetchUsers = async (req, res) => {
+  try {
+    const users = await userService.fetchUsers();
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
-exports.register = (req, res) => {
-  const user = userService.register(req.body);
-  res.status(201).json(user);
+exports.fetchUserById = async (req, res) => {
+  try {
+    const user = await userService.fetchUserById(req.body.id);
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
-exports.login = (req, res) => {
-  console.log(req.body);
+exports.fetchUserByUsername = async (req, res) => {
+  try {
+    const user = await userService.fetchUserByUsername(req.body.username);
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };

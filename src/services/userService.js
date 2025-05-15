@@ -1,14 +1,16 @@
-const db = require("../config/db");
-
-exports.fetchUsers = () => {};
-
-exports.createUser = async (req, res) => {
-  try {
-    const user = await User.create(req.body);
-    res.status(201).json(user);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+const user = require("../models/user");
+exports.fetchUserByUsername = async (username) => {
+  return await user
+    .findOne({
+      username: username,
+    })
+    .populate();
 };
 
-exports.login = (data) => {};
+exports.fetchUserById = async (id) => {
+  return await user.findOne({ id: id }).populate();
+};
+
+exports.fetchUsers = async () => {
+  return await user.find().populate();
+};
