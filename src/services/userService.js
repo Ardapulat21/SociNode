@@ -8,7 +8,7 @@ exports.fetchUserByUsername = async (username) => {
 };
 
 exports.fetchUserById = async (id) => {
-  return await user.findOne({ id: id }).populate();
+  return await user.findOne({ _id: id }).populate();
 };
 
 exports.fetchUsers = async () => {
