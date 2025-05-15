@@ -33,18 +33,21 @@ exports.createPost = async (req, res) => {
 
 exports.likePost = async (req, res) => {
   try {
-    const username = req.body.username;
+    const userId = req.body.userId;
     const postId = req.body.postId;
     const likedPost = await postService.fetchPostById(postId);
-    const fetchedUser = await userService.fetchUserByUsername(username);
+    const fetchedUser = await userService.fetchUserById(userId);
     let postLikes = likedPost.likes;
 
-    const index = postLikes.findIndex((like) => like.username === username);
+    console.log(postLikes);
+    console.log(userId);
+    const index = postLikes.findIndex((like) => like.id == userId);
     if (index !== -1) {
       postLikes = postLikes.filter((_, i) => i !== index);
     } else {
       postLikes = [...postLikes, fetchedUser];
     }
+
     await postService.updatePost({ id: postId }, { likes: postLikes });
     res.status(200).json(postLikes);
   } catch (err) {
