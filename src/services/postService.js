@@ -60,6 +60,8 @@ exports.fetchLikes = async (id) => {
   return fetchedPost.likes;
 };
 
+// exports.likePost = async(postId, id);
+
 exports.comment = async (postId, userId, comment) => {
   const fetchedUser = await userService.fetchUserById(userId);
   const commentedPost = await exports.fetchPostById(postId);

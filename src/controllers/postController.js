@@ -1,5 +1,4 @@
 const postService = require("../services/postService");
-const userService = require("../services/userService");
 exports.fetchPosts = async (req, res) => {
   try {
     const posts = await postService.fetchPosts();
@@ -33,22 +32,10 @@ exports.createPost = async (req, res) => {
 
 exports.likePost = async (req, res) => {
   try {
-    const userId = req.body.userId;
-    const postId = req.body.postId;
-    const likedPost = await postService.fetchPostById(postId);
-    const fetchedUser = await userService.fetchUserById(userId);
-    let postLikes = likedPost.likes;
-
-    console.log(postLikes);
-    console.log(userId);
-    const index = postLikes.findIndex((like) => like.id == userId);
-    if (index !== -1) {
-      postLikes = postLikes.filter((_, i) => i !== index);
-    } else {
-      postLikes = [...postLikes, fetchedUser];
-    }
-
-    await postService.updatePost({ id: postId }, { likes: postLikes });
+    const postLikes = await postService.likePost(
+      req.body.userId,
+      req.body.postId
+    );
     res.status(200).json(postLikes);
   } catch (err) {
     res.status(500).json({ message: err.message });
