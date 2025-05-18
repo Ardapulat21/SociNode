@@ -2,8 +2,6 @@ const post = require("../models/post");
 const fs = require("fs");
 const path = require("path");
 const userService = require("./userService");
-let postCounter = 0;
-
 exports.fetchPosts = async () => {
   return await post
     .find()

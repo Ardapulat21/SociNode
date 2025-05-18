@@ -26,9 +26,10 @@ exports.login = async (req, res) => {
   try {
     const username = req.body.username;
     const password = req.body.password;
-    await authService.login(username, password);
+    const loggedUser = await authService.login(username, password);
     const sessionInfo = await userService.fetchUserByUsername(username);
-    res.status(200).json(sessionInfo);
+    const token = authService.signToken(loggedUser, sessionInfo);
+    res.status(200).json({ sessionInfo, token });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

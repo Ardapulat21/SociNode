@@ -1,7 +1,7 @@
 const user = require("../models/user");
 const auth = require("../models/auth");
-
-let userCounter = 0;
+const jwt = require("jsonwebtoken");
+const config = require("../config/config");
 
 exports.fetchUsers = async () => {
   const users = await auth.find();
@@ -13,18 +13,15 @@ exports.register = async (username, password) => {
   if (fetchedUser) throw new Error("Username has taken");
 
   await auth.create({
-    id: userCounter,
     username: username,
     password: password,
   });
 
   const sessionUser = {
-    id: userCounter,
     username: username,
     imgUrl: "uploads/picture.png",
   };
 
-  userCounter++;
   await user.create(sessionUser);
   return sessionUser;
 };
@@ -43,6 +40,25 @@ exports.fetchUserById = async (id) => {
     id: id,
   });
   return fetchedUser;
+};
+
+exports.signToken = (loggedUser, sessionInfo) => {
+  try {
+    const token = jwt.sign(
+      {
+        userId: loggedUser._id.toString(),
+        username: loggedUser.username,
+        imgUrl: sessionInfo.imgUrl,
+      },
+      config.secret_key,
+      {
+        expiresIn: "1m",
+      }
+    );
+    return token;
+  } catch (err) {
+    throw new Error(err);
+  }
 };
 
 exports.fetchUserByUsername = async (username) => {
