@@ -38,7 +38,6 @@ exports.fetchLikes = async (req, res) => {
 
 exports.likePost = async (req, res) => {
   try {
-    console.log(req.body);
     const postLikes = await postService.likePost(
       req.body.userId,
       req.body.postId
