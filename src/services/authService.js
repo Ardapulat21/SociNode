@@ -19,6 +19,9 @@ exports.register = async (username, password) => {
 
   const sessionUser = {
     username: username,
+    friends: [],
+    pendingRequests: [],
+    notifications: [],
     imgUrl: "uploads/picture.png",
   };
 
@@ -46,13 +49,14 @@ exports.signToken = (loggedUser, sessionInfo) => {
   try {
     const token = jwt.sign(
       {
-        userId: loggedUser._id.toString(),
+        authId: loggedUser._id.toString(),
+        userId: sessionInfo._id.toString(),
         username: loggedUser.username,
         imgUrl: sessionInfo.imgUrl,
       },
       config.secret_key,
       {
-        expiresIn: "1m",
+        expiresIn: "1h",
       }
     );
     return token;
