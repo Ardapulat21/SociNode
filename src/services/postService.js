@@ -57,14 +57,14 @@ exports.likePost = async (userId, postId) => {
   const likedPost = await exports.fetchPostById(postId);
   const fetchedUser = await userService.fetchUserById(userId);
   let postLikes = likedPost.likes;
-  console.log("likedPost", likedPost);
-  console.log("fetcheduser", fetchedUser);
+
   const index = postLikes.findIndex((like) => like._id == userId);
   if (index !== -1) {
     postLikes = postLikes.filter((_, i) => i !== index);
   } else {
     postLikes = [...postLikes, fetchedUser];
   }
+
   await exports.updatePost({ _id: postId }, { likes: postLikes });
   return postLikes;
 };

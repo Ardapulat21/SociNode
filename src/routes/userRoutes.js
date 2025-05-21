@@ -6,5 +6,7 @@ router.get("/", userController.fetchUsers);
 router.get("/fetchUserByUsername", userController.fetchUserByUsername);
 router.get("/fetchUserById", userController.fetchUserById);
 router.get("/fetchFriends", userController.fetchFriends);
+router.post("/invite", userController.invite);
+router.post("/acceptInvite", userController.acceptInvite);
 
 module.exports = router;
