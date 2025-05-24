@@ -8,87 +8,131 @@ exports.fetchUserByUsername = async (username) => {
 };
 
 exports.fetchUserById = async (id) => {
-  return await user.findOne({ _id: id }).populate();
+  return await user
+    .findOne({ _id: id })
+    .populate(["friends", "pendingRequests", "invitedUsers", "notifications"]);
 };
 
 exports.fetchUsers = async () => {
-  return await user.find().populate();
+  return await user
+    .find()
+    .populate(["friends", "pendingRequests", "invitedUsers", "notifications"]);
 };
 
-exports.invite = async (toUserId, fromUserId) => {
-  if (toUserId == fromUserId)
-    throw new Error("User can not make request itself.");
+exports.invite = async (receiverId, senderId) => {
+  try {
+    const receiverAndSender = await findReceiverAndSender(receiverId, senderId);
+    const receiver = receiverAndSender.receiver;
+    const sender = receiverAndSender.sender;
 
-  const toUser = await exports.fetchUserById(toUserId);
-  const fromUser = await exports.fetchUserById(fromUserId);
+    let receiversPendingRequests = receiver.pendingRequests;
+    let sendersInviteds = sender.invitedUsers;
 
-  let toUsersPendingRequest = toUser.pendingRequests;
-  let fromUsersInvitedUser = fromUser.invitedUsers;
-
-  const index = toUsersPendingRequest.findIndex(
-    (request) => request._id == fromUserId
-  );
-
-  if (index !== -1) {
-    toUsersPendingRequest = toUsersPendingRequest.filter((_, i) => i !== index);
-    fromUsersInvitedUser = fromUsersInvitedUser.filter(
-      (invitedUser) => invitedUser._id != toUserId
+    const index = receiversPendingRequests.findIndex(
+      (request) => request._id == senderId
     );
-  } else {
-    toUsersPendingRequest = [...toUsersPendingRequest, fromUser];
-    fromUsersInvitedUser = [...fromUsersInvitedUser, toUser];
+
+    if (index !== -1) {
+      receiversPendingRequests = receiversPendingRequests.filter(
+        (_, i) => i !== index
+      );
+      sendersInviteds = sendersInviteds.filter(
+        (invited) => invited._id != receiverId
+      );
+    } else {
+      receiversPendingRequests = [...receiversPendingRequests, sender];
+      sendersInviteds = [...sendersInviteds, receiver];
+    }
+    await updateUser([
+      { _id: receiverId },
+      {
+        pendingRequests: data.receiversPendingRequests,
+      },
+      { _id: senderId },
+      { invitedUsers: data.sendersInviteds },
+    ]);
+  } catch (err) {
+    throw new Error(err.message);
   }
-
-  await user.updateOne(
-    { _id: toUserId },
-    { pendingRequests: toUsersPendingRequest }
-  );
-
-  await user.updateOne(
-    { _id: fromUserId },
-    { invitedUsers: fromUsersInvitedUser }
-  );
+};
+exports.acceptInvite = async (receiverId, senderId) => {
+  try {
+    const data = await responseInvite(receiverId, senderId);
+    const receiversFriends = [data.sender, ...data.receiver.friends];
+    const sendersFriends = [data.receiver, ...data.sender.friends];
+    await updateUser([
+      { _id: receiverId },
+      {
+        pendingRequests: data.receiversPendingRequests,
+        friends: receiversFriends,
+      },
+      { _id: senderId },
+      { invitedUsers: data.sendersInviteds, friends: sendersFriends },
+    ]);
+  } catch (err) {
+    throw new Error(err.message);
+  }
 };
 
-exports.acceptInvite = async (approvedId, requestedId) => {
-  if (approvedId == requestedId)
+exports.rejectInvite = async (receiverId, senderId) => {
+  try {
+    const data = await responseInvite(receiverId, senderId);
+    await updateUser([
+      { _id: receiverId },
+      { pendingRequests: data.receiversPendingRequests },
+      { _id: senderId },
+      { invitedUsers: data.sendersInviteds },
+    ]);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
+//This function erases the request from receivers pending request and the senders invited
+//user then returns the updated data.After calling this function,db updates is needed.
+const responseInvite = async (receiverId, senderId) => {
+  try {
+    const receiverAndSender = await findReceiverAndSender(receiverId, senderId);
+    const receiver = receiverAndSender.receiver;
+    const sender = receiverAndSender.sender;
+
+    let receiversPendingRequests = receiver.pendingRequests;
+    let sendersInviteds = sender.invitedUsers;
+
+    const index = receiversPendingRequests.findIndex(
+      (request) => request._id == senderId
+    );
+
+    if (index !== -1) {
+      receiversPendingRequests = receiversPendingRequests.filter(
+        (_, i) => i !== index
+      );
+      sendersInviteds = sendersInviteds.filter(
+        (invited) => invited._id != receiverId
+      );
+
+      return {
+        receiver: receiver,
+        receiversPendingRequests: receiversPendingRequests,
+        sender: sender,
+        sendersInviteds: sendersInviteds,
+      };
+    }
+    return null;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
+
+const findReceiverAndSender = async (receiverId, senderId) => {
+  if (receiverId == senderId)
     throw new Error("User can not accept the invite itself.");
-  const approvedUser = await exports.fetchUserById(approvedId);
-  const requestedUser = await exports.fetchUserById(requestedId);
+  const receiver = await exports.fetchUserById(receiverId);
+  const sender = await exports.fetchUserById(senderId);
+  return { sender: sender, receiver: receiver };
+};
 
-  let approvedPendingRequests = approvedUser.pendingRequests;
-  let requestedUserInvitedUsers = requestedUser.invitedUsers;
-
-  let approvedsFriends = approvedUser.friends;
-  let requestedsFriends = requestedUser.friends;
-
-  const index = approvedPendingRequests.findIndex(
-    (request) => request._id == requestedId
-  );
-  if (index !== -1) {
-    approvedPendingRequests = approvedPendingRequests.filter(
-      (_, i) => i !== index
-    );
-    requestedUserInvitedUsers = requestedUserInvitedUsers.filter(
-      (invited) => invited._id != approvedId
-    );
-
-    approvedsFriends = [...approvedsFriends, requestedUser];
-    requestedsFriends = [...requestedsFriends, approvedUser];
-
-    // console.log("Requested user's invited user:", requestedUserInvitedUsers);
-    // console.log("Approved user's pending request:", approvedPendingRequests);
-
-    // console.log("Requested User's friends:", requestedsFriends);
-    // console.log("Approved User's friends:", approvedsFriends);
-    await user.updateOne(
-      { _id: approvedId },
-      { pendingRequests: approvedPendingRequests, friends: approvedsFriends }
-    );
-
-    await user.updateOne(
-      { _id: requestedId },
-      { invitedUsers: requestedUserInvitedUsers, friends: requestedsFriends }
-    );
+const updateUser = async (updates) => {
+  for (const { query, updated } of updates) {
+    await user.updateOne(query, updated);
   }
 };
