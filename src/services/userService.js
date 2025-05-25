@@ -10,7 +10,13 @@ exports.fetchUserByUsername = async (username) => {
 exports.fetchUserById = async (id) => {
   return await user
     .findOne({ _id: id })
-    .populate(["friends", "pendingRequests", "invitedUsers", "notifications"]);
+    .populate([
+      "friends",
+      "pendingRequests",
+      "invitedUsers",
+      "notifications",
+      "notifications.user",
+    ]);
 };
 
 exports.fetchUsers = async () => {
