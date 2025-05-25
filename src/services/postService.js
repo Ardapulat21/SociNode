@@ -66,7 +66,7 @@ exports.likePost = async (userId, postId) => {
     index = postOwnersNotifications.findIndex(
       (notification) =>
         notification.user._id.toString() === fetchedUser._id.toString() &&
-        notification.notificationType === "like" &&
+        notification.notificationType === "liked" &&
         notification.postId.toString() === likedPost._id.toString()
     );
 
@@ -75,10 +75,11 @@ exports.likePost = async (userId, postId) => {
         (_, i) => i !== index
       );
     } else {
-      postOwnersNotifications = [
-        ...postOwnersNotifications,
-        { user: fetchedUser, notificationType: "like", postId: likedPost._id },
-      ];
+      postOwnersNotifications.push({
+        user: fetchedUser,
+        notificationType: "liked",
+        postId: postId,
+      });
     }
 
     await userService.updateUser([
@@ -103,6 +104,8 @@ exports.fetchLikes = async (id) => {
 exports.comment = async (postId, userId, comment) => {
   const fetchedUser = await userService.fetchUserById(userId);
   const commentedPost = await exports.fetchPostById(postId);
+  const postOwner = commentedPost.user;
+  let postOwnersNotifications = postOwner.notifications;
   const comments = [
     ...commentedPost.comments,
     {
@@ -110,6 +113,19 @@ exports.comment = async (postId, userId, comment) => {
       comment: comment,
     },
   ];
+  if (userId != postOwner._id) {
+    postOwnersNotifications.push({
+      user: fetchedUser,
+      notificationType: "commented",
+      postId: postId,
+    });
+    await userService.updateUser([
+      {
+        query: { _id: postOwner._id },
+        updated: { notifications: postOwnersNotifications },
+      },
+    ]);
+  }
   await updatePost([
     { query: { _id: postId }, updated: { comments: comments } },
   ]);
