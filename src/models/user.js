@@ -8,7 +8,8 @@ const UserScheme = new mongoose.Schema({
   notifications: [
     {
       user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      notification: { type: String, required: true },
+      notificationType: { type: String, required: true },
+      postId: { type: String, required: true },
     },
   ],
   imgUrl: { type: String, required: true },

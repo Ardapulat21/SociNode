@@ -43,13 +43,17 @@ exports.invite = async (receiverId, senderId) => {
       receiversPendingRequests = [...receiversPendingRequests, sender];
       sendersInviteds = [...sendersInviteds, receiver];
     }
-    await updateUser([
-      { _id: receiverId },
+    await exports.updateUser([
       {
-        pendingRequests: data.receiversPendingRequests,
+        query: { _id: receiverId },
+        updated: {
+          pendingRequests: receiversPendingRequests,
+        },
       },
-      { _id: senderId },
-      { invitedUsers: data.sendersInviteds },
+      {
+        query: { _id: senderId },
+        updated: { invitedUsers: sendersInviteds },
+      },
     ]);
   } catch (err) {
     throw new Error(err.message);
@@ -60,14 +64,21 @@ exports.acceptInvite = async (receiverId, senderId) => {
     const data = await responseInvite(receiverId, senderId);
     const receiversFriends = [data.sender, ...data.receiver.friends];
     const sendersFriends = [data.receiver, ...data.sender.friends];
-    await updateUser([
-      { _id: receiverId },
+    await exports.updateUser([
       {
-        pendingRequests: data.receiversPendingRequests,
-        friends: receiversFriends,
+        query: { _id: receiverId },
+        updated: {
+          pendingRequests: data.receiversPendingRequests,
+          friends: receiversFriends,
+        },
       },
-      { _id: senderId },
-      { invitedUsers: data.sendersInviteds, friends: sendersFriends },
+      {
+        query: { _id: senderId },
+        updated: {
+          invitedUsers: data.sendersInviteds,
+          friends: sendersFriends,
+        },
+      },
     ]);
   } catch (err) {
     throw new Error(err.message);
@@ -77,11 +88,15 @@ exports.acceptInvite = async (receiverId, senderId) => {
 exports.rejectInvite = async (receiverId, senderId) => {
   try {
     const data = await responseInvite(receiverId, senderId);
-    await updateUser([
-      { _id: receiverId },
-      { pendingRequests: data.receiversPendingRequests },
-      { _id: senderId },
-      { invitedUsers: data.sendersInviteds },
+    await exports.updateUser([
+      {
+        query: { _id: receiverId },
+        updated: { pendingRequests: data.receiversPendingRequests },
+      },
+      {
+        query: { _id: senderId },
+        updated: { invitedUsers: data.sendersInviteds },
+      },
     ]);
   } catch (err) {
     throw new Error(err.message);
@@ -131,7 +146,7 @@ const findReceiverAndSender = async (receiverId, senderId) => {
   return { sender: sender, receiver: receiver };
 };
 
-const updateUser = async (updates) => {
+exports.updateUser = async (updates) => {
   for (const { query, updated } of updates) {
     await user.updateOne(query, updated);
   }

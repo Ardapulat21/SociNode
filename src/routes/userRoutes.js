@@ -4,7 +4,7 @@ const userController = require("../controllers/userController");
 
 router.get("/", userController.fetchUsers);
 router.get("/fetchUserByUsername", userController.fetchUserByUsername);
-router.get("/fetchUserById", userController.fetchUserById);
+router.post("/fetchUserById", userController.fetchUserById);
 router.get("/fetchFriends", userController.fetchFriends);
 router.post("/invite", userController.invite);
 router.post("/acceptInvite", userController.acceptInvite);
