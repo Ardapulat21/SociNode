@@ -47,8 +47,23 @@ exports.invite = async (req, res) => {
 
 exports.acceptInvite = async (req, res) => {
   try {
-    await userService.acceptInvite(req.decodedToken.userId, req.body.toUserId);
-    res.status(200).json("OK");
+    const pendingRequests = await userService.acceptInvite(
+      req.decodedToken.userId,
+      req.body.toUserId
+    );
+    res.status(200).json(pendingRequests);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.declineInvite = async (req, res) => {
+  try {
+    const pendingRequests = await userService.declineInvite(
+      req.decodedToken.userId,
+      req.body.toUserId
+    );
+    res.status(200).json(pendingRequests);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

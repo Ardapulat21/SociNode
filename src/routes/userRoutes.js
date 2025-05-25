@@ -8,5 +8,6 @@ router.post("/fetchUserById", userController.fetchUserById);
 router.get("/fetchFriends", userController.fetchFriends);
 router.post("/invite", userController.invite);
 router.post("/acceptInvite", userController.acceptInvite);
+router.post("/declineInvite", userController.declineInvite);
 
 module.exports = router;

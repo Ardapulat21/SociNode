@@ -46,8 +46,8 @@ exports.invite = async (receiverId, senderId) => {
         (invited) => invited._id != receiverId
       );
     } else {
-      receiversPendingRequests = [...receiversPendingRequests, sender];
-      sendersInviteds = [...sendersInviteds, receiver];
+      receiversPendingRequests = [sender, ...receiversPendingRequests];
+      sendersInviteds = [receiver, ...sendersInviteds];
     }
     await exports.updateUser([
       {
@@ -86,12 +86,13 @@ exports.acceptInvite = async (receiverId, senderId) => {
         },
       },
     ]);
+    return receiversPendingRequests;
   } catch (err) {
     throw new Error(err.message);
   }
 };
 
-exports.rejectInvite = async (receiverId, senderId) => {
+exports.declineInvite = async (receiverId, senderId) => {
   try {
     const data = await responseInvite(receiverId, senderId);
     await exports.updateUser([
@@ -104,6 +105,7 @@ exports.rejectInvite = async (receiverId, senderId) => {
         updated: { invitedUsers: data.sendersInviteds },
       },
     ]);
+    return receiversPendingRequests;
   } catch (err) {
     throw new Error(err.message);
   }
