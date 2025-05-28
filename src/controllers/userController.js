@@ -39,7 +39,7 @@ exports.fetchFriends = async (req, res) => {
 exports.invite = async (req, res) => {
   try {
     await userService.invite(req.body.toUserId, req.decodedToken.userId);
-    res.status(200).json("OK");
+    res.status(200).json("Invite has been sent");
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -64,6 +64,26 @@ exports.declineInvite = async (req, res) => {
       req.body.toUserId
     );
     res.status(200).json(pendingRequests);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.removeFriend = async (req, res) => {
+  try {
+    console.log("decodedtoken", req.decodedToken.userId);
+    console.log("toUserId", req.body.toUserId);
+    await userService.removeFriend(req.decodedToken.userId, req.body.toUserId);
+    res.status(200).json("User successfully has been removed.");
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+};
+
+exports.changeProfilePhoto = async (req, res) => {
+  try {
+    const user = await userService.changeProfilePhoto(req.body, req.file);
+    res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

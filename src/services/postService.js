@@ -16,7 +16,6 @@ exports.fetchPostById = async (id) => {
 
 exports.createPost = async (body, file) => {
   let username = body.username;
-  console.log(body);
   const fetchedUser = await userService.fetchUserByUsername(username);
   let imgUrl = undefined;
   if (file) {
