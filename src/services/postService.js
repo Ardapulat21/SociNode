@@ -2,6 +2,7 @@ const post = require("../models/post");
 const fs = require("fs");
 const path = require("path");
 const userService = require("./userService");
+
 exports.fetchPosts = async () => {
   return await post
     .find()
@@ -135,6 +136,35 @@ exports.comment = async (postId, userId, comment) => {
     { query: { _id: postId }, updated: { comments: comments } },
   ]);
   return comments;
+};
+
+exports.fetchHomepagePosts = async (userId) => {
+  const actor = await userService.fetchUserById(userId);
+  if (!actor) throw new Error("User could not be found");
+  const actorsFriends = [actor, ...actor.friends];
+
+  const allPosts = await exports.fetchPosts();
+  if (!allPosts) throw new Error("Post could not be found.");
+
+  const homepagePosts = allPosts.filter((post) =>
+    actorsFriends.some((friend) => friend._id == post.user._id.toString())
+  );
+  return homepagePosts;
+};
+exports.fetchExplorePosts = async (userId) => {
+  const actor = await userService.fetchUserById(userId);
+  if (!actor) throw new Error("User could not be found");
+  const actorsFriends = [actor, ...actor.friends];
+
+  const allPosts = await exports.fetchPosts();
+  if (!allPosts) throw new Error("Post could not be found.");
+
+  const explorePosts = allPosts.filter(
+    (post) =>
+      !actorsFriends.some((friend) => friend._id == post.user._id.toString())
+  );
+
+  return explorePosts;
 };
 
 const updatePost = async (updates) => {

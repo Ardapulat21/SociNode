@@ -60,3 +60,26 @@ exports.comment = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.fetchHomepagePosts = async (req, res) => {
+  try {
+    const homepagePosts = await postService.fetchHomepagePosts(
+      req.decodedToken.userId
+    );
+    console.log(homepagePosts);
+    res.status(200).json(homepagePosts);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.fetchExplorePosts = async (req, res) => {
+  try {
+    const explorePosts = await postService.fetchExplorePosts(
+      req.decodedToken.userId
+    );
+    res.status(200).json(explorePosts);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

@@ -5,6 +5,8 @@ const postController = require("../controllers/postController");
 const fileRoutes = require("../routes/fileRoutes");
 
 router.get("/", postController.fetchPosts);
+router.get("/fetchHomepagePosts", postController.fetchHomepagePosts);
+router.get("/fetchExplorePosts", postController.fetchExplorePosts);
 router.post("/fetchPost", postController.fetchPost);
 router.post("/", fileRoutes.single("image"), postController.createPost);
 router.post("/like", postController.likePost);

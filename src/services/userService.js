@@ -169,20 +169,16 @@ exports.removeFriend = async (actorId, removedUserId) => {
 
   let actorFriends = actor.friends;
   let index = actorFriends.findIndex((friend) => friend._id == removedUserId);
-  console.log(actorFriends.length);
 
   if (index === -1) throw new Error("Friend to be removed could not be found");
   actorFriends = actorFriends.filter((_, i) => i !== index);
 
-  console.log(actorFriends.length);
   let removedUserFriends = removedUser.friends;
-  console.log(removedUserFriends.length);
 
   index = removedUserFriends.findIndex((friend) => friend._id == actorId);
 
   if (index === -1) throw new Error("Friend to be removed could not be found");
   removedUserFriends = removedUserFriends.filter((_, i) => i !== index);
-  console.log(removedUserFriends.length);
 
   await exports.updateUser([
     {
