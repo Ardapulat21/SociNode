@@ -83,3 +83,12 @@ exports.fetchExplorePosts = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.fetchProfilePosts = async (req, res) => {
+  try {
+    const profilePosts = await postService.fetchProfilePosts(req.body.id);
+    res.status(200).json(profilePosts);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

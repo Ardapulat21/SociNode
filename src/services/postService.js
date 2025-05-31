@@ -167,6 +167,14 @@ exports.fetchExplorePosts = async (userId) => {
   return explorePosts;
 };
 
+exports.fetchProfilePosts = async (userId) => {
+  const posts = await exports.fetchPosts();
+  const profilePosts = posts
+    .filter((post) => post.user._id.toString() == userId)
+    .reverse();
+  return profilePosts;
+};
+
 const updatePost = async (updates) => {
   for (const { query, updated } of updates) {
     await post.updateOne(query, updated);

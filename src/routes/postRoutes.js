@@ -8,6 +8,7 @@ router.get("/", postController.fetchPosts);
 router.get("/fetchHomepagePosts", postController.fetchHomepagePosts);
 router.get("/fetchExplorePosts", postController.fetchExplorePosts);
 router.post("/fetchPost", postController.fetchPost);
+router.post("/fetchProfilePosts", postController.fetchProfilePosts);
 router.post("/", fileRoutes.single("image"), postController.createPost);
 router.post("/like", postController.likePost);
 router.post("/fetchLikes", postController.fetchLikes);
