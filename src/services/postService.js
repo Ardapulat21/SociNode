@@ -149,7 +149,7 @@ exports.fetchHomepagePosts = async (userId) => {
   const homepagePosts = allPosts.filter((post) =>
     actorsFriends.some((friend) => friend._id == post.user._id.toString())
   );
-  return homepagePosts;
+  return homepagePosts.reverse();
 };
 exports.fetchExplorePosts = async (userId) => {
   const actor = await userService.fetchUserById(userId);
@@ -164,7 +164,7 @@ exports.fetchExplorePosts = async (userId) => {
       !actorsFriends.some((friend) => friend._id == post.user._id.toString())
   );
 
-  return explorePosts;
+  return explorePosts.reverse();
 };
 
 exports.fetchProfilePosts = async (userId) => {
