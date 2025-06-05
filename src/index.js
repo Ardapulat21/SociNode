@@ -41,16 +41,12 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  console.log("User connected");
-
   socket.on("join_room", (roomId) => {
     socket.join(roomId);
-    console.log(`joined room ${roomId}`);
   });
 
   socket.on("send_message", (data) => {
     const messageInfo = JSON.parse(data);
-    console.log(messageInfo);
     messageService.saveMessage(messageInfo);
     io.to(messageInfo.room).emit("receive_message", data);
   });
