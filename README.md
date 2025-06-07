@@ -1,1 +1,2 @@
 # SociNode
+SociNode is the backend service for the Soci social networking application. Developed with Node.js, it is responsible for handling all HTTP requests, routing, and business logic. The backend is designed to manage user authentication, posts, likes, comments, messages, and notifications efficiently. MongoDB is used as the primary database to store and retrieve data related to users, posts, and real-time interactions. SociNode ensures a scalable and reliable foundation for the Soci frontend, supporting seamless communication and dynamic content delivery.
