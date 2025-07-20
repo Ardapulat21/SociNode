@@ -15,8 +15,8 @@ const messageRoutes = require("./routes/messageRoutes");
 
 const verifyToken = require("./middleware/authMiddleware");
 
-const PORT = 3000;
-const FRONTPORT = 5173;
+const PORT = 3001;
+const FRONTPORT = 5174;
 
 const app = express();
 connectDB();
@@ -35,7 +35,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const io = new Server(server, {
   cors: {
-    origin: `http://localhost:${FRONTPORT}`,
+    origin: `http://144.91.99.115:${FRONTPORT}`,
     methods: ["GET", "POST"],
   },
 });
